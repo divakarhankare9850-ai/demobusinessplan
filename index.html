@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+<title>SurplusSetu — Sustainable Construction Material Marketplace</title>
+<meta name="description" content="SurplusSetu is India's leading marketplace for buying and selling leftover and surplus construction materials.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { DEFAULT: '#F36B21', dark: '#D95A14', 50: '#FEF1E9' },
+          ink: '#25282C',
+          canvas: '#F8F8F6',
+          muted: '#6B7280',
+          line: '#E5E7EB',
+          success: { DEFAULT: '#059669', 50: '#ECFDF5' },
+          warning: { DEFAULT: '#D97706', 50: '#FFFBEB' },
+          danger: { DEFAULT: '#DC2626', 50: '#FEF2F2' }
+        },
+        fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'] },
+        boxShadow: { card: '0 1px 3px rgba(37,40,44,.05), 0 1px 2px rgba(37,40,44,.03)', lift: '0 10px 25px -5px rgba(37,40,44,.1), 0 8px 10px -6px rgba(37,40,44,.05)' }
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+
+<!-- Design-system component layer -->
+<style type="text/tailwindcss">
+  @layer base {
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body { @apply bg-canvas text-ink font-sans antialiased selection:bg-brand-50 selection:text-brand-dark; }
+  }
+  @layer components {
+    .wrap { @apply max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8; }
+    .btn { @apply inline-flex items-center justify-center gap-2 h-11 sm:h-10 px-5 sm:px-4 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:opacity-50 active:scale-[0.98]; }
+    .btn-lg { @apply h-12 px-6 text-[15px]; }
+    .btn-sm { @apply h-9 px-3 text-[13px]; }
+    .btn-primary { @apply bg-brand text-white hover:bg-brand-dark hover:shadow-md; }
+    .btn-secondary { @apply bg-white text-ink border border-line hover:bg-canvas hover:border-gray-300; }
+    .btn-tertiary { @apply text-ink hover:text-brand px-2 bg-transparent hover:bg-brand-50/50; }
+    .btn-danger { @apply bg-danger text-white hover:bg-red-700; }
+    .icon-btn { @apply inline-flex items-center justify-center w-11 h-11 sm:w-10 sm:h-10 rounded-lg text-ink hover:bg-canvas transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95; }
+    .label { @apply block text-sm font-semibold text-ink mb-1.5; }
+    .field { @apply w-full h-12 sm:h-11 rounded-lg border border-line bg-white px-3.5 text-sm text-ink placeholder:text-muted transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand; }
+    textarea.field { @apply h-auto py-3 leading-relaxed resize-y; }
+    .field[aria-invalid="true"] { @apply border-danger ring-2 ring-danger/20; }
+    .chip { @apply inline-flex items-center h-10 sm:h-9 px-4 sm:px-3.5 rounded-full border border-line bg-white text-sm font-medium text-ink whitespace-nowrap transition-all duration-200 hover:border-ink hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand; }
+    .chip[aria-pressed="true"] { @apply bg-brand border-brand text-white hover:border-brand hover:bg-brand-dark; }
+    .card { @apply bg-white border border-line rounded-xl shadow-card transition-shadow duration-200; }
+    .badge { @apply inline-flex items-center gap-1.5 h-6 px-2.5 rounded-md text-xs font-bold uppercase tracking-wider; }
+    .filter-opt { @apply flex items-center justify-between w-full text-left text-sm px-3 py-2.5 rounded-lg text-ink hover:bg-canvas transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand; }
+    .filter-opt[aria-pressed="true"] { @apply bg-brand-50 text-brand-dark font-semibold; }
+    .section-title { @apply text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-ink; }
+  }
+</style>
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .modal-in { animation: modalIn .25s cubic-bezier(0.16, 1, 0.3, 1); }
+  .toast-in { animation: toastIn .3s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: none; } }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .drawer-in { animation: drawerIn .3s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes drawerIn { from { transform: translateX(-100%); } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+</style>
+</head>
+
+<body>
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:bg-ink focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lift font-semibold">Skip to content</a>
+
+<header id="nav" class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-line shadow-sm"></header>
+<main id="main" tabindex="-1" class="outline-none min-h-[70vh]"><div id="app"></div></main>
+<footer id="footer"></footer>
+
+<div id="modal-root"></div>
+<div id="drawer-root"></div>
+<div id="toast-root" class="fixed z-[90] bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:bottom-6 flex flex-col gap-2.5 items-center sm:items-end pointer-events-none" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   SurplusSetu — Application Logic
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inr = n => '₹' + Math.round(Number(n)).toLocaleString('en-IN');
+const icons = () => { if (window.lucide) lucide.createIcons(); };
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+};
+
+/* ---------- Constants ---------- */
+const COMMISSION = 0.08;
+const CATS = ['Tiles & Stone', 'Cement & Concrete', 'Steel & Rebar', 'Plumbing & Sanitary', 'Electrical', 'Wood & Boards', 'Paint & Finishes', 'Bricks & Blocks', 'Doors & Windows'];
+const CAT_ART = { 'Tiles & Stone': 'Tiles', 'Cement & Concrete': 'Cement', 'Steel & Rebar': 'Steel', 'Plumbing & Sanitary': 'Plumbing', 'Electrical': 'Electrical', 'Wood & Boards': 'Wood', 'Paint & Finishes': 'Paint', 'Bricks & Blocks': 'Bricks', 'Doors & Windows': 'Doors' };
+const CONDS = ['New, unused', 'New, open box', 'Used, good condition'];
+const AREAS = ['Baner', 'Chakan', 'Hadapsar', 'Hinjewadi', 'Kharadi', 'Kothrud', 'Pimpri', 'Talegaon', 'Viman Nagar', 'Wakad'];
+const UNITS = ['piece', 'sq ft', 'kg', 'bag', 'sheet', 'bucket', 'coil', 'set', 'length'];
+const SHELF = ['Not applicable', 'Under 3 months', '3 to 6 months', '6 to 12 months', '12+ months'];
+const PRICE_BUCKETS = [
+  { id: 'any', label: 'Any lot value', test: () => true },
+  { id: 'u20', label: 'Under ₹20,000', test: v => v < 20000 },
+  { id: 'm50', label: '₹20,000 – ₹50,000', test: v => v >= 20000 && v < 50000 },
+  { id: 'm100', label: '₹50,000 – ₹1,00,000', test: v => v >= 50000 && v < 100000 },
+  { id: 'o100', label: 'Above ₹1,00,000', test: v => v >= 100000 }
+];
+const SORTS = [
+  { id: 'relevance', label: 'Recommended' },
+  { id: 'newest', label: 'Newest first' },
+  { id: 'lotLow', label: 'Lot value: low to high' },
+  { id: 'lotHigh', label: 'Lot value: high to low' },
+  { id: 'savings', label: 'Highest savings' }
+];
+const STATUS = {
+  reviewed: { label: 'Verified Listing', icon: 'shield-check', cls: 'bg-success-50 text-success' },
+  declared: { label: 'Standard Listing', icon: 'check-circle', cls: 'bg-canvas text-muted border border-line' },
+  pending: { label: 'Pending Review', icon: 'clock', cls: 'bg-warning-50 text-warning' }
+};
+
+/* ---------- Initial Data State ---------- */
+const day = d => Date.now() - d * 864e5;
+const SEED = [
+  { id: 'p1', title: 'Vitrified floor tiles, 600×600 mm, matte ivory', cat: 'Tiles & Stone', price: 38, mrp: 62, unit: 'sq ft', qty: 420, cond: 'New, unused', shelf: 'Not applicable', area: 'Wakad', seller: 'Shree Interiors', status: 'reviewed', created: day(2), featured: 1, desc: 'Leftover from a completed 3 BHK fit-out. Eleven sealed boxes, same batch number. Pickup from the site store room; loading help available.' },
+  { id: 'p2', title: 'PPC cement, 50 kg bags, sealed', cat: 'Cement & Concrete', price: 340, mrp: 395, unit: 'bag', qty: 60, cond: 'New, unused', shelf: '3 to 6 months', area: 'Hadapsar', seller: 'Patil Constructions', status: 'reviewed', created: day(1), featured: 1, desc: 'Stored indoors on pallets, off the floor. Bags are intact and dry. Best used within the shelf life shown.' },
+  { id: 'p3', title: 'TMT Fe500 rebar, 12 mm, 12 m lengths', cat: 'Steel & Rebar', price: 58, mrp: 72, unit: 'kg', qty: 1800, cond: 'New, unused', shelf: 'Not applicable', area: 'Chakan', seller: 'Deshmukh Builders', status: 'declared', created: day(4), desc: 'Bought for a slab that was redesigned. Surface rust is light and typical of open storage. Mill test certificate can be shared on request.' },
+  { id: 'p4', title: 'CPVC pipes, 1 inch, 3 m lengths', cat: 'Plumbing & Sanitary', price: 165, mrp: 240, unit: 'length', qty: 90, cond: 'New, unused', shelf: 'Not applicable', area: 'Kharadi', seller: 'Aarav Plumbing Works', status: 'declared', created: day(6), desc: 'Excess from a residential tower project. Includes no fittings. Pipes are stored under cover.' },
+  { id: 'p5', title: 'FR copper wire, 2.5 sq mm, 90 m coils', cat: 'Electrical', price: 1650, mrp: 2150, unit: 'coil', qty: 14, cond: 'New, unused', shelf: 'Not applicable', area: 'Kharadi', seller: 'Joshi Electricals', status: 'reviewed', created: day(3), desc: 'Factory-sealed coils, mixed colours: red, black and green. Ideal for finishing or small contractor jobs.' },
+  { id: 'p6', title: 'BWP plywood, 19 mm, 8×4 ft sheets', cat: 'Wood & Boards', price: 1480, mrp: 2050, unit: 'sheet', qty: 36, cond: 'New, open box', shelf: 'Not applicable', area: 'Hinjewadi', seller: 'Kale Furnishing', status: 'reviewed', created: day(1), featured: 1, desc: 'Stacked flat in a dry godown. A few sheets have minor edge marks from handling. Surfaces are clean.' },
+  { id: 'p7', title: 'Exterior emulsion paint, 20 L, white', cat: 'Paint & Finishes', price: 3900, mrp: 5600, unit: 'bucket', qty: 11, cond: 'New, unused', shelf: '12+ months', area: 'Viman Nagar', seller: 'Nikam Paint Contractors', status: 'reviewed', created: day(5), featured: 1, desc: 'Sealed buckets from a cancelled facade job. Batch numbers visible on request. Storage has been indoors.' },
+  { id: 'p8', title: 'Red clay bricks, first class', cat: 'Bricks & Blocks', price: 7.5, mrp: 10, unit: 'piece', qty: 6000, cond: 'New, unused', shelf: 'Not applicable', area: 'Talegaon', seller: 'Bhosale Site Supplies', status: 'declared', created: day(8), desc: 'Palletised, uncovered stock. Expect a small number of broken pieces. Buyer arranges transport.' },
+  { id: 'p9', title: 'Black granite kitchen slabs, 8 ft', cat: 'Tiles & Stone', price: 9800, mrp: 14500, unit: 'piece', qty: 4, cond: 'Used, good condition', shelf: 'Not applicable', area: 'Kothrud', seller: 'Gokhale Renovations', status: 'declared', created: day(9), desc: 'Removed carefully during a kitchen remodel. Edges polished, one slab has a small chip near the corner (photographed).' },
+  { id: 'p10', title: 'Modular switches and plates, assorted', cat: 'Electrical', price: 95, mrp: 160, unit: 'piece', qty: 240, cond: 'New, open box', shelf: 'Not applicable', area: 'Pimpri', seller: 'Joshi Electricals', status: 'declared', created: day(7), desc: 'Mix of 6A and 16A switches with white plates. Boxes opened for counting; all pieces are unused.' },
+  { id: 'p11', title: 'Wall-hung WC sets with concealed cistern', cat: 'Plumbing & Sanitary', price: 5200, mrp: 8400, unit: 'set', qty: 8, cond: 'New, unused', shelf: 'Not applicable', area: 'Baner', seller: 'Aarav Plumbing Works', status: 'reviewed', created: day(2), desc: 'Boxed sets, never installed. Includes mounting frame and flush plate. Original cartons are intact.' },
+  { id: 'p12', title: 'Sal wood door frames, 7×3 ft', cat: 'Doors & Windows', price: 3200, mrp: 4800, unit: 'piece', qty: 18, cond: 'Used, good condition', shelf: 'Not applicable', area: 'Hadapsar', seller: 'Patil Constructions', status: 'declared', created: day(10), desc: 'Taken out from a demolished block. Wood is sound with no termite damage observed. Needs light sanding.' },
+  /* My Profile Listings */
+  { id: 'm1', mine: 1, title: 'AAC blocks, 600×200×100 mm', cat: 'Bricks & Blocks', price: 52, mrp: 68, unit: 'piece', qty: 900, cond: 'New, unused', shelf: 'Not applicable', area: 'Chakan', seller: 'Your Business Profile', status: 'reviewed', created: day(3), desc: 'Covered and stacked on a levelled pad. Delivered on pallets if the buyer brings a truck.' },
+  { id: 'm2', mine: 1, title: 'Aluminium sliding window frames, 4×4 ft', cat: 'Doors & Windows', price: 3600, mrp: 5200, unit: 'piece', qty: 14, cond: 'New, open box', shelf: 'Not applicable', area: 'Pimpri', seller: 'Your Business Profile', status: 'declared', created: day(5), desc: 'Powder-coated grey frames without glass. Three frames have light transit scratches.' },
+  { id: 'm3', mine: 1, title: 'Laminate flooring planks, 8 mm', cat: 'Wood & Boards', price: 95, mrp: 140, unit: 'sq ft', qty: 300, cond: 'New, unused', shelf: 'Not applicable', area: 'Baner', seller: 'Your Business Profile', status: 'pending', created: day(0), desc: 'Oak finish click-lock planks, sealed packs. Submitted today and awaiting review.' }
+];
+const SEED_ENQ = [
+  { id: 'e1', dir: 'in', listingId: 'm1', listingTitle: 'AAC blocks, 600×200×100 mm', buyer: 'Rohan K.', phone: '9822334401', qty: 400, message: 'Can you hold 400 blocks until Friday? I can bring a tempo.', status: 'new', created: day(1) },
+  { id: 'e2', dir: 'in', listingId: 'm2', listingTitle: 'Aluminium sliding window frames, 4×4 ft', buyer: 'Meera S.', phone: '9822334402', qty: 6, message: 'Are the frames compatible with a 4 ft opening in a 9 inch wall?', status: 'new', created: day(2) },
+  { id: 'e3', dir: 'in', listingId: 'm1', listingTitle: 'AAC blocks, 600×200×100 mm', buyer: 'Vikram P.', phone: '9822334403', qty: 200, message: 'Interested in 200 pieces. Is the price negotiable for pickup this weekend?', status: 'accepted', created: day(4) }
+];
+
+/* ---------- State Management ---------- */
+const state = {
+  listings: store.get('ss_listings_v2', null) || (store.set('ss_listings_v2', SEED), SEED),
+  enquiries: store.get('ss_enquiries_v2', null) || (store.set('ss_enquiries_v2', SEED_ENQ), SEED_ENQ),
+  saved: store.get('ss_saved_v2', []),
+  homeCat: 'All',
+  f: { q: '', cat: 'All', cond: 'Any', price: 'any', area: 'Any', reviewed: false, sort: 'relevance' },
+  dash: 'overview',
+  view: 'home'
+};
+const persist = () => { store.set('ss_listings_v2', state.listings); store.set('ss_enquiries_v2', state.enquiries); store.set('ss_saved_v2', state.saved); };
+const byId = id => state.listings.find(l => l.id === id);
+const lot = l => l.price * l.qty;
+const savePct = l => l.mrp && l.mrp > l.price ? Math.round((1 - l.price / l.mrp) * 100) : 0;
+const fmtDate = t => new Date(t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+/* ---------- SVGs / Visual Assets ---------- */
+const BG = { Tiles: '#EFECE5', Cement: '#ECE9E2', Steel: '#E8E8E6', Plumbing: '#EEEBE4', Electrical: '#EDEBE6', Wood: '#EFEAE0', Paint: '#EFECE6', Bricks: '#EDE5DC', Doors: '#ECEAE5' };
+const bag = (x, y) => `<g><rect x="${x}" y="${y}" width="150" height="88" rx="12" fill="#CFCABD"/><rect x="${x}" y="${y + 30}" width="150" height="26" fill="#F36B21"/><rect x="${x + 44}" y="${y + 36}" width="62" height="14" rx="3" fill="#fff" opacity=".9"/><path d="M${x + 8} ${y + 8}h134" stroke="#B9B3A5" stroke-width="3"/></g>`;
+const PARTS = {
+  Tiles: k => { let s = ''; const c = ['#D8D3C8', '#CCC6B8', '#E3DFD5', '#C4BDAE']; for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) { const x = 68 + i * 118, y = 52 + j * 118; s += `<rect x="${x}" y="${y}" width="110" height="110" rx="3" fill="${c[(i * 3 + j + k) % 4]}"/><path d="M${x + 14} ${y + 96}L${x + 96} ${y + 14}" stroke="#fff" stroke-opacity=".4" stroke-width="3"/>`; } return s; },
+  Cement: () => bag(75, 300) + bag(225, 300) + bag(375, 300) + bag(150, 205) + bag(300, 205) + bag(225, 110),
+  Steel: () => { let s = ''; for (let r = 0; r < 5; r++) { const n = r % 2 ? 6 : 7, off = r % 2 ? 78 : 52; for (let i = 0; i < n; i++) s += `<circle cx="${off + i * 78}" cy="${90 + r * 66}" r="30" fill="#4A4F57"/><circle cx="${off + i * 78}" cy="${90 + r * 66}" r="20" fill="none" stroke="#6E7580" stroke-width="3"/><circle cx="${off + i * 78}" cy="${90 + r * 66}" r="6" fill="#F36B21"/>`; } return s; },
+  Plumbing: () => { let s = ''; [[70, 460], [90, 440], [60, 470], [100, 430]].forEach(([x, w], i) => { const y = 78 + i * 84; s += `<rect x="${x}" y="${y}" width="${w}" height="46" rx="23" fill="#fff" stroke="#D3CEC3" stroke-width="3"/><rect x="${x + 70}" y="${y}" width="16" height="46" fill="#F36B21"/><rect x="${x + w - 86}" y="${y}" width="16" height="46" fill="#F36B21"/>`; }); return s; },
+  Electrical: () => `<g fill="none"><circle cx="205" cy="230" r="108" stroke="#25282C" stroke-width="44"/><circle cx="205" cy="230" r="108" stroke="#F36B21" stroke-width="6" stroke-dasharray="12 10"/><circle cx="395" cy="250" r="88" stroke="#3B4047" stroke-width="38"/><circle cx="395" cy="250" r="88" stroke="#fff" stroke-opacity=".5" stroke-width="4" stroke-dasharray="10 12"/></g>`,
+  Wood: () => { let s = ''; const c = ['#C9A47A', '#BE9768', '#D2AF88', '#B98F61', '#C6A073', '#D0AB82']; for (let i = 0; i < 6; i++) { const y = 62 + i * 58; s += `<rect x="${60 + (i % 2) * 14}" y="${y}" width="470" height="48" rx="4" fill="${c[i]}"/><path d="M${90 + (i % 2) * 14} ${y + 16}h360M${130 + (i % 3) * 20} ${y + 32}h300" stroke="#fff" stroke-opacity=".25" stroke-width="3"/>`; } return s; },
+  Paint: () => [90, 235, 380].map((x, i) => `<g><rect x="${x}" y="${170 + (i % 2) * 20}" width="130" height="170" rx="10" fill="#fff" stroke="#D3CEC3" stroke-width="3"/><rect x="${x}" y="${222 + (i % 2) * 20}" width="130" height="40" fill="#F36B21"/><ellipse cx="${x + 65}" cy="${170 + (i % 2) * 20}" rx="65" ry="14" fill="#E4E0D7" stroke="#D3CEC3" stroke-width="3"/><path d="M${x + 12} ${170 + (i % 2) * 20}Q${x + 65} ${95 + (i % 2) * 20} ${x + 118} ${170 + (i % 2) * 20}" fill="none" stroke="#8B9097" stroke-width="4"/></g>`).join(''),
+  Bricks: k => { let s = ''; const c = ['#C4623A', '#B85630', '#CF7048', '#BC5B34']; for (let r = 0; r < 8; r++) { const off = r % 2 ? -50 : 0; for (let i = 0; i < 7; i++) s += `<rect x="${off + i * 106 + 14}" y="${28 + r * 52}" width="100" height="46" rx="3" fill="${c[(i + r * 2 + k) % 4]}"/>`; } return s; },
+  Doors: () => `<rect x="150" y="50" width="300" height="350" rx="6" fill="#fff" stroke="#25282C" stroke-width="20"/><path d="M300 50V400M150 225H450" stroke="#25282C" stroke-width="12"/><rect x="170" y="70" width="120" height="145" fill="#DDE3E6" opacity=".7"/><path d="M175 205L285 80" stroke="#fff" stroke-width="8" opacity=".7"/><rect x="258" y="226" width="8" height="42" rx="4" fill="#F36B21"/>`
+};
+const svgUri = s => 'data:image/svg+xml;utf8,' + encodeURIComponent(s);
+function art(cat, seed = 0) {
+  const k = CAT_ART[cat] || cat;
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450"><rect width="600" height="450" fill="${BG[k] || '#EEE'}"/>${(PARTS[k] || PARTS.Tiles)(seed)}</svg>`);
+}
+function heroArt() {
+  const cells = [['Bricks', 0, 0], ['Tiles', 1, 0], ['Steel', 0, 1], ['Cement', 1, 1]];
+  const g = cells.map(([k, c, r]) => `<svg x="${c * 404}" y="${r * 324}" width="396" height="316" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid slice"><rect width="600" height="450" fill="${BG[k]}"/>${PARTS[k](1)}</svg>`).join('');
+  return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 640"><rect width="800" height="640" fill="#fff"/>${g}</svg>`);
+}
+const imgOf = l => (l.imgs && l.imgs[0]) || art(l.cat, l.id.charCodeAt(l.id.length - 1));
+
+/* ---------- Core UI Components ---------- */
+const btn = (label, { v = 'secondary', icon = '', size = '', attrs = '', cls = '' } = {}) =>
+  `<button type="button" class="btn btn-${v} ${size ? 'btn-' + size : ''} ${cls}" ${attrs}>${icon ? `<i data-lucide="${icon}" class="w-[18px] h-[18px] mr-1"></i>` : ''}${label}</button>`;
+const linkBtn = (label, href, { v = 'secondary', icon = '', size = '', cls = '' } = {}) =>
+  `<a href="${href}" class="btn btn-${v} ${size ? 'btn-' + size : ''} ${cls}">${icon ? `<i data-lucide="${icon}" class="w-[18px] h-[18px] mr-1"></i>` : ''}${label}</a>`;
+const statusBadge = s => { const m = STATUS[s] || STATUS.declared; return `<span class="badge ${m.cls}"><i data-lucide="${m.icon}" class="w-3.5 h-3.5"></i>${m.label}</span>`; };
+const chip = (label, active, attrs) => `<button type="button" class="chip" aria-pressed="${!!active}" ${attrs}>${esc(label)}</button>`;
+const statCard = (label, value, icon, note = '') => `<div class="card p-5 lg:p-6"><div class="flex items-center justify-between"><p class="text-sm font-medium text-muted">${label}</p><span class="w-10 h-10 rounded-lg bg-canvas grid place-items-center text-ink border border-line"><i data-lucide="${icon}" class="w-5 h-5"></i></span></div><p class="mt-4 text-3xl font-extrabold tracking-tight text-ink">${value}</p>${note ? `<p class="text-xs text-muted mt-2 font-medium">${note}</p>` : ''}</div>`;
+const emptyState = (icon, title, text, action = '') => `<div class="card border-dashed border-2 border-line/80 p-10 text-center"><span class="mx-auto w-14 h-14 rounded-full bg-canvas grid place-items-center"><i data-lucide="${icon}" class="w-7 h-7 text-muted"></i></span><h3 class="mt-5 text-lg font-bold text-ink">${title}</h3><p class="mt-2 text-sm text-muted max-w-sm mx-auto leading-relaxed">${text}</p>${action ? `<div class="mt-6 flex justify-center">${action}</div>` : ''}</div>`;
+function field({ id, label, type = 'text', ph = '', req = false, help = '', opts = null, rows = 4, attrs = '', ph0 = 'Select an option' }) {
+  let control;
+  if (opts) control = `<select id="${id}" name="${id}" class="field" ${attrs}><option value="">${ph0}</option>${opts.map(o => `<option>${esc(o)}</option>`).join('')}</select>`;
+  else if (type === 'textarea') control = `<textarea id="${id}" name="${id}" rows="${rows}" class="field" placeholder="${esc(ph)}" ${attrs}></textarea>`;
+  else control = `<input id="${id}" name="${id}" type="${type}" class="field" placeholder="${esc(ph)}" ${attrs}>`;
+  return `<div><label for="${id}" class="label">${label}${req ? '' : ' <span class="text-muted font-normal text-xs ml-1">(Optional)</span>'}</label>${control}${help ? `<p class="text-xs text-muted mt-2">${help}</p>` : ''}<p data-err="${id}" class="hidden text-xs text-danger mt-2 font-medium" role="alert"></p></div>`;
+}
+
+/* Product card */
+function productCard(p) {
+  const sv = savePct(p), saved = state.saved.includes(p.id);
+  return `<article class="card overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lift hover:-translate-y-1 group">
+    <div class="relative overflow-hidden">
+      <button type="button" data-action="open" data-id="${p.id}" class="block w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand" aria-label="View ${esc(p.title)}">
+        <img src="${imgOf(p)}" alt="${esc(p.title)}" class="w-full aspect-[4/3] object-cover bg-canvas group-hover:scale-105 transition-transform duration-500" loading="lazy">
+      </button>
+      <div class="absolute top-3 left-3">${statusBadge(p.status).replace('badge ', 'badge shadow-card bg-white ').replace(/bg-(success-50|canvas|warning-50) /, '')}</div>
+      <button type="button" data-action="save" data-id="${p.id}" aria-pressed="${saved}" aria-label="${saved ? 'Remove from saved' : 'Save listing'}" class="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur border border-line grid place-items-center hover:bg-white hover:border-ink hover:scale-105 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i data-lucide="heart" class="w-4 h-4 ${saved ? 'text-brand fill-brand' : 'text-ink'}"></i></button>
+    </div>
+    <div class="p-4 sm:p-5 flex flex-col flex-1">
+      <p class="text-xs font-semibold uppercase tracking-wider text-muted">${esc(p.cat)}</p>
+      <h3 class="mt-1.5 text-[16px] font-bold text-ink leading-tight line-clamp-2 min-h-[2.8rem]"><button type="button" data-action="open" data-id="${p.id}" class="text-left hover:text-brand focus-visible:outline-none focus-visible:underline before:absolute before:inset-0">${esc(p.title)}</button></h3>
+      <div class="mt-4 flex items-baseline gap-2 flex-wrap">
+        <span class="text-2xl font-extrabold tracking-tight text-ink">${inr(p.price)}</span><span class="text-sm font-medium text-muted">/ ${esc(p.unit)}</span>
+        ${p.mrp > p.price ? `<span class="text-xs font-medium text-muted line-through ml-1">${inr(p.mrp)}</span>` : ''}
+      </div>
+      <p class="mt-1 h-5 text-xs font-bold text-success">${sv ? `Save ${sv}% vs new market price` : ''}</p>
+      <dl class="mt-4 pt-4 border-t border-line grid grid-cols-2 gap-y-2.5 text-xs font-medium text-muted">
+        <div class="flex items-center gap-2"><i data-lucide="package" class="w-4 h-4 text-ink"></i><dd class="truncate">${p.qty.toLocaleString('en-IN')} ${esc(p.unit)}</dd></div>
+        <div class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-ink"></i><dd class="truncate">${esc(p.area)}, Pune</dd></div>
+        <div class="flex items-center gap-2 col-span-2"><i data-lucide="shield-check" class="w-4 h-4 text-ink"></i><dd class="truncate">${esc(p.cond)} · ${esc(p.seller)}</dd></div>
+      </dl>
+    </div>
+  </article>`;
+}
+
+/* Modals, Drawer, Toast, Confirm */
+const modals = [];
+let lastProductModal = null;
+function lockScroll() { document.body.classList.toggle('overflow-hidden', modals.length > 0 || !!$('#drawer-root').firstChild); }
+function openModal({ title, body, size = 'max-w-lg' }) {
+  const id = 'dlg' + Date.now() + Math.floor(Math.random() * 99);
+  const wrap = document.createElement('div');
+  wrap.className = 'fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-4';
+  wrap.innerHTML = `<div class="absolute inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" data-action="close-modal"></div>
+    <div role="dialog" aria-modal="true" aria-labelledby="${id}" class="relative w-full ${size} max-h-[92vh] flex flex-col bg-white rounded-t-2xl sm:rounded-2xl shadow-lift modal-in">
+      <div class="flex-shrink-0 bg-white flex items-center justify-between gap-4 px-6 py-4 border-b border-line rounded-t-2xl"><h2 id="${id}" class="text-lg font-bold text-ink">${esc(title)}</h2><button type="button" data-action="close-modal" class="icon-btn -mr-2 bg-canvas hover:bg-line" aria-label="Close dialog"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div class="modal-body p-6 overflow-y-auto no-scrollbar">${body}</div></div>`;
+  wrap._prev = document.activeElement;
+  $('#modal-root').appendChild(wrap); modals.push(wrap); lockScroll(); icons();
+  setTimeout(() => (focusables(wrap.querySelector('[role=dialog]'))[1] || wrap.querySelector('button')).focus(), 20);
+  return wrap;
+}
+function setModalBody(html, title) { const m = modals[modals.length - 1]; if (!m) return; $('.modal-body', m).innerHTML = html; if (title) $('h2', m).textContent = title; icons(); const f = focusables($('.modal-body', m))[0]; if (f) f.focus(); }
+function closeModal() { const m = modals.pop(); if (!m) return; m.remove(); lockScroll(); if (m._prev && document.contains(m._prev)) m._prev.focus(); if (!modals.length) lastProductModal = null; }
+const focusables = root => $$('a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])', root).filter(el => el.offsetParent !== null);
+let confirmCb = null;
+function confirmDialog({ title, text, label = 'Confirm', danger = true, onConfirm }) {
+  confirmCb = onConfirm;
+  openModal({ title, size: 'max-w-md', body: `<p class="text-base text-muted leading-relaxed">${text}</p><div class="mt-8 flex flex-col-reverse sm:flex-row justify-end gap-3">${btn('Cancel', { attrs: 'data-action="close-modal"', cls: 'w-full sm:w-auto' })}${btn(label, { v: danger ? 'danger' : 'primary', attrs: 'data-action="confirm-yes"', cls: 'w-full sm:w-auto' })}</div>` });
+}
+function toast(msg, type = 'success') {
+  const ic = { success: ['check-circle-2', 'text-success bg-success-50'], error: ['alert-circle', 'text-danger bg-danger-50'], info: ['info', 'text-brand bg-brand-50'] }[type];
+  const t = document.createElement('div');
+  t.className = 'toast-in pointer-events-auto flex items-center gap-3 bg-white text-ink text-[15px] font-medium rounded-xl shadow-lift border border-line p-3 max-w-sm w-full sm:w-auto';
+  t.innerHTML = `<span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${ic[1]}"><i data-lucide="${ic[0]}" class="w-5 h-5"></i></span><span class="flex-1 pr-2 leading-tight">${esc(msg)}</span><button type="button" class="w-8 h-8 rounded-md grid place-items-center hover:bg-canvas text-muted transition-colors" aria-label="Dismiss notification"><i data-lucide="x" class="w-4 h-4"></i></button>`;
+  $('#toast-root').appendChild(t); icons();
+  const kill = () => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 200); };
+  $('button', t).onclick = kill; setTimeout(kill, 4500);
+}
+
+/* Validation */
+function validate(form, rules) {
+  let ok = true, first = null;
+  Object.entries(rules).forEach(([id, fn]) => {
+    const el = form.elements[id], msg = fn(el.type === 'checkbox' ? el.checked : el.value.trim());
+    const out = $(`[data-err="${id}"]`, form);
+    if (msg) { ok = false; el.setAttribute('aria-invalid', 'true'); if (out) { out.textContent = msg; out.classList.remove('hidden'); } if (!first) first = el; }
+    else { el.removeAttribute('aria-invalid'); if (out) out.classList.add('hidden'); }
+  });
+  if (first) first.focus();
+  return ok;
+}
+const need = m => v => (v ? '' : m);
+const phoneRule = v => /^[6-9]\d{9}$/.test(v.replace(/\s|-/g, '')) ? '' : 'Enter a valid 10-digit Indian mobile number.';
+const emailRule = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Enter a valid email address.';
+
+/* ---------- Layout: Nav + Footer ---------- */
+function renderNav() {
+  const v = state.view;
+  const link = (href, label, on) => `<a href="${href}" class="px-3.5 py-2 text-[15px] font-semibold rounded-lg ${on ? 'text-brand bg-brand-50/50' : 'text-ink hover:text-brand hover:bg-canvas'} transition-all" ${on ? 'aria-current="page"' : ''}>${label}</a>`;
+  $('#nav').innerHTML = `<div class="wrap h-20 flex items-center justify-between gap-4">
+    <a href="#/" class="flex items-center gap-3 shrink-0 group" aria-label="SurplusSetu home">
+      <span class="w-10 h-10 rounded-xl bg-ink grid place-items-center group-hover:bg-brand transition-colors"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M3 17h18M5 17v-5a7 7 0 0 1 14 0v5M12 5v4"/></svg></span>
+      <span class="leading-tight"><span class="block text-xl font-extrabold tracking-tight text-ink">SurplusSetu</span><span class="hidden sm:block text-[12px] font-medium text-muted">Sustainable Material Hub</span></span>
+    </a>
+    <nav class="hidden md:flex items-center gap-1.5" aria-label="Primary">
+      ${link('#/marketplace', 'Marketplace', v === 'marketplace')}${link('#/how', 'How It Works', false)}${link('#/sustainability', 'Sustainability', false)}${link('#/dashboard', 'Dashboard', v === 'dashboard')}
+    </nav>
+    <div class="flex items-center gap-3">
+      ${btn('Log in', { v: 'secondary', cls: 'hidden sm:inline-flex border-transparent hover:border-line shadow-none font-bold', attrs: 'data-action="login"' })}
+      ${linkBtn('Sell Surplus', '#/sell', { v: 'primary', icon: 'plus' })}
+      <button type="button" class="icon-btn md:hidden bg-canvas border border-line" data-action="nav-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu"><i data-lucide="menu" class="w-5 h-5"></i></button>
+    </div></div>
+    <div id="mobile-menu" class="hidden md:hidden border-t border-line bg-white shadow-lift absolute w-full"><nav class="wrap py-4 flex flex-col gap-1" aria-label="Mobile">
+      ${['#/marketplace|Marketplace', '#/how|How It Works', '#/sustainability|Sustainability', '#/dashboard|Seller dashboard'].map(x => { const [h, t] = x.split('|'); return `<a href="${h}" class="py-3.5 px-4 text-[16px] font-bold rounded-lg hover:bg-canvas transition-colors border-b border-line last:border-0">${t}</a>`; }).join('')}
+      <div class="pt-4 px-4 pb-2">${btn('Log in', { cls: 'w-full', attrs: 'data-action="login"' })}</div></nav></div>`;
+  icons();
+}
+function renderFooter() {
+  const col = (t, items) => `<div><h4 class="text-[15px] font-bold text-white mb-5">${t}</h4><ul class="space-y-3 text-[15px] text-[#A1A1AA] font-medium">${items.map(i => `<li>${i}</li>`).join('')}</ul></div>`;
+  const a = (h, t, extra = '') => `<a href="${h}" class="hover:text-white hover:underline transition-colors" ${extra}>${t}</a>`;
+  $('#footer').innerHTML = `<div class="bg-ink text-white mt-0 border-t-4 border-brand"><div class="wrap pt-16 pb-10">
+    <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+      <div>
+        <div class="flex items-center gap-3"><span class="w-10 h-10 rounded-xl bg-brand grid place-items-center shadow-lg shadow-brand/20"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M3 17h18M5 17v-5a7 7 0 0 1 14 0v5M12 5v4"/></svg></span><span class="text-2xl font-extrabold tracking-tight">SurplusSetu</span></div>
+        <p class="mt-6 text-[15px] text-[#A1A1AA] max-w-sm leading-relaxed font-medium">The intelligent bridge connecting surplus construction materials with the next build that needs them.</p>
+        <p class="mt-4 text-sm text-[#71717A] max-w-sm">Driving circular economy in India's construction sector by ensuring usable materials are never wasted.</p>
+      </div>
+      ${col('Marketplace', [a('#/marketplace', 'Browse all materials'), a('#/marketplace', 'Tiles & stone', 'data-action="goto-cat" data-cat="Tiles & Stone"'), a('#/marketplace', 'Steel & rebar', 'data-action="goto-cat" data-cat="Steel & Rebar"'), a('#/marketplace', 'Electrical', 'data-action="goto-cat" data-cat="Electrical"')])}
+      ${col('For Sellers', [a('#/sell', 'List surplus materials'), a('#/dashboard', 'Seller dashboard'), a('#/how', 'How it works'), a('#/sustainability', 'Why reuse matters')])}
+      ${col('Contact Us', ['<span class="flex items-center gap-2.5"><i data-lucide="mail" class="w-5 h-5 text-brand"></i>hello@surplussetu.in</span>', '<span class="flex items-center gap-2.5"><i data-lucide="phone" class="w-5 h-5 text-brand"></i>+91 800 555 0199</span>', '<span class="flex items-center gap-2.5"><i data-lucide="map-pin" class="w-5 h-5 text-brand"></i>Pune, Maharashtra, India</span>'])}
+    </div>
+    <div class="mt-14 pt-8 border-t border-white/10 flex flex-col md:flex-row gap-4 justify-between items-center text-sm font-medium text-[#71717A]">
+      <p>© 2026 SurplusSetu. All rights reserved.</p>
+      <p>Empowering sustainable construction across India.</p>
+    </div>
+  </div></div>`;
+  icons();
+}
+
+/* ---------- Views ---------- */
+function filtered() {
+  const f = state.f, q = f.q.toLowerCase().trim(), pb = PRICE_BUCKETS.find(b => b.id === f.price);
+  let r = state.listings.filter(l => l.status !== 'pending' || l.mine);
+  r = r.filter(l => (!q || [l.title, l.cat, l.area, l.seller, l.desc].join(' ').toLowerCase().includes(q))
+    && (f.cat === 'All' || l.cat === f.cat) && (f.cond === 'Any' || l.cond === f.cond) && (f.area === 'Any' || l.area === f.area)
+    && pb.test(lot(l)) && (!f.reviewed || l.status === 'reviewed'));
+  const s = { relevance: (a, b) => (b.featured || 0) - (a.featured || 0) || b.created - a.created, newest: (a, b) => b.created - a.created, lotLow: (a, b) => lot(a) - lot(b), lotHigh: (a, b) => lot(b) - lot(a), savings: (a, b) => savePct(b) - savePct(a) }[f.sort];
+  return r.sort(s);
+}
+
+/* Home */
+function viewHome() {
+  const calc = `<div class="card p-6 lg:p-8 bg-brand-50 border-brand/20">
+    <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold text-ink">Estimated Payout</h3><i data-lucide="calculator" class="w-6 h-6 text-brand"></i></div>
+    <p class="text-[15px] font-medium text-brand-dark mb-6">Calculation based on standard ${COMMISSION * 100}% seller commission.</p>
+    <dl class="space-y-4 text-[15px] font-medium text-ink">
+      <div class="flex justify-between pb-4 border-b border-brand/20"><dt>Listing sale value</dt><dd class="font-bold">₹30,000</dd></div>
+      <div class="flex justify-between pb-4 border-b border-brand/20"><dt>Platform commission (${COMMISSION * 100}%)</dt><dd class="font-bold text-danger">− ₹2,400</dd></div>
+      <div class="flex justify-between items-center pt-2"><dt class="font-bold text-lg">Net payout received</dt><dd class="text-3xl font-extrabold text-brand">₹27,600</dd></div>
+    </dl></div>`;
+  const li = (items) => items.map(t => `<li class="flex gap-3 text-[15px] font-medium"><i data-lucide="check" class="w-5 h-5 text-success shrink-0 mt-0.5"></i><span>${t}</span></li>`).join('');
+  const step = (n, ic, t, d) => `<div class="card p-6 lg:p-8 hover:-translate-y-1 transition-transform duration-300"><div class="flex items-center justify-between mb-6"><span class="w-12 h-12 rounded-xl bg-canvas text-brand border border-line grid place-items-center shadow-sm"><i data-lucide="${ic}" class="w-6 h-6"></i></span><span class="text-sm font-bold text-muted uppercase tracking-wider">Step ${n}</span></div><h3 class="text-xl font-bold text-ink mb-3">${t}</h3><p class="text-[15px] text-muted leading-relaxed font-medium">${d}</p></div>`;
+  return `
+  <section class="bg-canvas overflow-hidden"><div class="wrap py-12 lg:py-24 grid lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+    <div class="z-10">
+      <div class="inline-flex items-center gap-2.5 h-8 px-4 rounded-full bg-white border border-line text-xs font-bold tracking-wide text-ink shadow-sm mb-6"><span class="w-2 h-2 rounded-full bg-brand animate-pulse"></span>LIVE IN PUNE · CONSTRUCTION MARKETPLACE</div>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight text-ink">Your Surplus Is Someone Else’s Building Material.</h1>
+      <p class="mt-6 text-lg sm:text-xl font-medium text-muted max-w-xl leading-relaxed">Turn leftover tiles, steel, cement, and fittings into recovered capital. Connect directly with local contractors and builders looking for verified, immediately available materials.</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">${linkBtn('Explore Marketplace', '#/marketplace', { v: 'primary', size: 'lg', icon: 'search', cls: 'shadow-lg shadow-brand/20' })}${linkBtn('List Your Materials', '#/sell', { v: 'secondary', size: 'lg' })}</div>
+      <ul class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-line pt-8">
+        ${[['map-pin', 'Local Network', 'Find materials within your region.'], ['shield-check', 'Verified Details', 'Condition and quantity guaranteed.'], ['indian-rupee', 'Transparent Rates', 'Clear unit pricing and lot values.']].map(([i, t, d]) => `<li class="flex gap-4"><span class="w-10 h-10 rounded-xl bg-white border border-line shadow-sm grid place-items-center shrink-0"><i data-lucide="${i}" class="w-5 h-5 text-brand"></i></span><div><span class="block text-[15px] font-bold text-ink mb-1">${t}</span><span class="block text-sm text-muted font-medium">${d}</span></div></li>`).join('')}
+      </ul>
+    </div>
+    <div class="relative w-full max-w-lg mx-auto lg:max-w-none">
+      <div class="absolute inset-0 bg-gradient-to-tr from-brand/10 to-transparent rounded-3xl transform rotate-3 scale-105"></div>
+      <img src="${heroArt()}" alt="Stacks of high-quality construction materials ready for reuse" class="relative w-full aspect-[4/3] object-cover rounded-2xl border-4 border-white shadow-2xl z-10">
+      <div class="absolute -bottom-8 left-4 sm:-left-8 right-4 sm:right-auto sm:w-[360px] card p-5 shadow-2xl z-20">
+        <div class="flex items-start justify-between gap-3 border-b border-line pb-4 mb-4"><div><p class="text-base font-bold text-ink leading-snug pr-4">Vitrified floor tiles, 600×600 mm</p></div><span class="badge bg-success-50 text-success shrink-0"><i data-lucide="shield-check" class="w-4 h-4"></i>Verified</span></div>
+        <div class="flex items-end justify-between"><div><span class="text-3xl font-extrabold text-ink">₹38</span><span class="text-[15px] font-medium text-muted"> / sq ft</span></div><div class="text-right"><p class="text-[13px] font-bold text-success uppercase tracking-wide">Save 39%</p><p class="text-xs font-medium text-muted">vs market rate</p></div></div>
+        <p class="mt-4 pt-4 border-t border-line text-[13px] font-semibold text-muted flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-ink"></i>Wakad, Pune · 420 sq ft ready</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white border-y border-line"><div class="wrap py-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
+    ${[['map-pinned', 'Localized discovery'], ['file-check-2', 'Strict material vetting'], ['receipt-text', 'Upfront pricing'], ['recycle', 'Reducing landfill waste']].map(([i, t]) => `<div class="flex items-center gap-3.5"><span class="w-10 h-10 rounded-full bg-canvas grid place-items-center shrink-0"><i data-lucide="${i}" class="w-5 h-5 text-ink"></i></span><span class="text-[15px] font-bold text-ink">${t}</span></div>`).join('')}
+  </div></section>
+
+  <section class="wrap py-16 lg:py-24">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8">
+      <div class="max-w-2xl"><h2 class="section-title">Premium Materials Available</h2><p class="mt-3 text-lg font-medium text-muted">A selection of what leading builders and contractors are currently offering.</p></div>
+      ${linkBtn('View All Materials', '#/marketplace', { v: 'secondary', icon: 'arrow-right' })}
+    </div>
+    <div id="home-chips" class="flex gap-2.5 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap pb-2"></div>
+    <div id="home-grid" class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"></div>
+  </section>
+
+  <section id="how" class="bg-canvas border-y border-line"><div class="wrap py-16 lg:py-24">
+    <div class="max-w-2xl text-center mx-auto mb-14"><h2 class="section-title">Streamlined Procurement</h2><p class="mt-4 text-lg font-medium text-muted">From identifying surplus stock to a confirmed site pickup in three simple steps.</p></div>
+    <div class="grid gap-6 md:grid-cols-3">
+      ${step(1, 'package-plus', 'List & Detail', 'Specify material type, exact quantity, condition, and asking price. High-quality photos accelerate the matching process.')}
+      ${step(2, 'search-check', 'Discover & Match', 'Buyers filter by location and material, instantly comparing surplus rates against standard market pricing before inquiring.')}
+      ${step(3, 'handshake', 'Connect & Secure', 'Finalize pickup logistics and payment terms directly. Our platform ensures seamless communication between verified parties.')}
+    </div></div></section>
+
+  <section class="wrap py-16 lg:py-24">
+    <div class="max-w-3xl mb-12"><h2 class="section-title">Optimized Value for Every Project</h2><p class="mt-4 text-lg font-medium text-muted">Surplus inventory drains capital and occupies vital site space. SurplusSetu turns idle assets into liquid funds while offering buyers unbeatable rates.</p></div>
+    <div class="grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
+      <div class="card p-6 lg:p-8"><span class="badge bg-ink text-white mb-6">Seller Advantages</span><ul class="space-y-4">${li(['Instantly recover capital from excess inventory', 'Reclaim valuable site and warehouse space', 'Connect instantly with buyers in your specific region', 'Zero listing fees; minimal transaction commission'])}</ul></div>
+      <div class="card p-6 lg:p-8"><span class="badge border border-ink text-ink mb-6">Buyer Advantages</span><ul class="space-y-4">${li(['Procure high-quality materials drastically below market rates', 'Full transparency on condition and expiration before contact', 'Minimize logistics costs with localized, nearby pickups', 'Evaluate lot values and savings comprehensively'])}</ul></div>
+      ${calc}
+    </div></section>
+
+  <section id="sustainability" class="bg-ink text-white"><div class="wrap py-16 lg:py-24 grid lg:grid-cols-[1fr_1.4fr] gap-12 lg:gap-20 items-center">
+    <div><h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">Usable Material Belongs in Buildings, Not Landfills.</h2><p class="mt-6 text-lg text-[#A1A1AA] font-medium leading-relaxed">The construction industry generates massive amounts of usable surplus. SurplusSetu ensures that perfectly good materials find their way into their next project, dramatically reducing ecological impact and waste.</p></div>
+    <div class="grid sm:grid-cols-2 gap-5">
+      ${[['repeat-2', 'Prioritize Reuse', 'We put unopened and perfectly viable materials back into the construction cycle.'], ['route', 'Reduce Emissions', 'Hyper-local matching drastically cuts down transportation distances and carbon footprints.'], ['eye', 'Inventory Visibility', 'Digitizing surplus stock means materials are actually found and utilized, not forgotten.'], ['leaf', 'Resource Efficiency', 'Extending the lifecycle of materials lessens the demand for raw extraction and manufacturing.']].map(([i, t, d]) => `<div class="rounded-2xl border border-white/10 bg-white/5 p-6 hover:bg-white/10 transition-colors"><div class="w-12 h-12 rounded-full bg-brand/20 text-brand grid place-items-center mb-5"><i data-lucide="${i}" class="w-6 h-6"></i></div><h3 class="text-[17px] font-bold mb-2">${t}</h3><p class="text-[14px] text-[#A1A1AA] font-medium leading-relaxed">${d}</p></div>`).join('')}
+    </div></div></section>`;
+}
+function renderHomeFeatured() {
+  const pool = state.listings.filter(l => l.status !== 'pending');
+  const cats2 = ['All', ...CATS.filter(c => pool.some(l => l.cat === c))].slice(0, 7);
+  $('#home-chips').innerHTML = cats2.map(c => chip(c, state.homeCat === c, `data-action="home-cat" data-cat="${esc(c)}"`)).join('');
+  let list = pool.filter(l => state.homeCat === 'All' ? l.featured : l.cat === state.homeCat);
+  if (state.homeCat === 'All' && list.length < 4) list = list.concat(pool.filter(l => !l.featured)).slice(0, 4);
+  list = list.slice(0, 4);
+  $('#home-grid').innerHTML = list.map(productCard).join('');
+  icons();
+}
+
+/* Marketplace */
+function filterPanel() {
+  const f = state.f;
+  const group = (title, items, key) => `<fieldset class="mt-8 first:mt-2"><legend class="text-xs font-bold uppercase tracking-wider text-muted mb-3 px-3">${title}</legend><div class="space-y-1">${items.map(([val, label]) => `<button type="button" class="filter-opt font-medium" aria-pressed="${f[key] === val}" data-action="set-filter" data-key="${key}" data-val="${esc(val)}"><span>${esc(label)}</span>${f[key] === val ? '<i data-lucide="check" class="w-4 h-4 text-brand"></i>' : ''}</button>`).join('')}</div></fieldset>`;
+  return `${group('Category', [['All', 'All categories'], ...CATS.map(c => [c, c])], 'cat')}
+    ${group('Condition', [['Any', 'Any condition'], ...CONDS.map(c => [c, c])], 'cond')}
+    ${group('Lot Value', PRICE_BUCKETS.map(b => [b.id, b.label]), 'price')}
+    ${group('Pickup Area', [['Any', 'All regions'], ...AREAS.map(a => [a, a])], 'area')}
+    <label class="mt-8 flex items-center gap-3 px-3 py-3 text-[15px] font-bold cursor-pointer rounded-lg hover:bg-canvas transition-colors"><input type="checkbox" class="w-5 h-5 accent-brand rounded" data-input="reviewed" ${f.reviewed ? 'checked' : ''}><span>Verified listings only</span></label>`;
+}
+function viewMarket() {
+  return `<section class="wrap py-8 lg:py-12">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8">
+      <div><h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-ink">Marketplace</h1><p class="mt-2 text-lg font-medium text-muted">Discover quality leftover materials from active projects.</p></div>
+      <div class="relative w-full lg:max-w-lg"><label for="mk-q" class="sr-only">Search materials</label><i data-lucide="search" class="w-5 h-5 text-muted absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <input id="mk-q" data-input="q" type="search" class="field h-14 pl-12 text-[16px] font-medium shadow-sm" placeholder="Search for tiles, steel, cement, or location..." value="${esc(state.f.q)}" autocomplete="off"></div>
+    </div>
+    <div class="lg:grid lg:grid-cols-[260px_1fr] lg:gap-10 items-start">
+      <aside class="hidden lg:block card p-4 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto no-scrollbar shadow-sm" aria-label="Filters"><div id="panel-desktop">${filterPanel()}</div></aside>
+      <div class="min-w-0">
+        <div class="flex items-center justify-between gap-4 flex-wrap border-b border-line pb-4">
+          <p id="mk-count" class="text-[15px] text-muted font-medium" aria-live="polite"></p>
+          <div class="flex items-center gap-3">
+            ${btn('Filters', { icon: 'sliders-horizontal', cls: 'lg:hidden border-line', attrs: 'data-action="open-filters"' })}
+            <div class="relative">
+              <label for="mk-sort" class="sr-only">Sort by</label>
+              <select id="mk-sort" data-input="sort" class="field h-11 w-auto pr-9 pl-4 text-[14px] font-bold bg-canvas border-transparent focus:border-brand cursor-pointer appearance-none">${SORTS.map(s => `<option value="${s.id}" ${state.f.sort === s.id ? 'selected' : ''}>${s.label}</option>`).join('')}</select>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-ink absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+        <div id="mk-chips" class="mt-5 flex gap-2.5 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap pb-1"></div>
+        <div id="mk-active" class="mt-4 flex flex-wrap gap-2.5"></div>
+        <div id="mk-grid" class="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"></div>
+      </div></div></section>`;
+}
+function updateMarket() {
+  const r = filtered(), f = state.f;
+  $('#mk-count').innerHTML = `<span class="font-extrabold text-ink">${r.length}</span> ${r.length === 1 ? 'listing' : 'listings'} found`;
+  $('#mk-chips').innerHTML = ['All', ...CATS].map(c => chip(c, f.cat === c, `data-action="set-filter" data-key="cat" data-val="${esc(c)}"`)).join('');
+  const act = [];
+  if (f.q) act.push(['q', `“${f.q}”`]); if (f.cond !== 'Any') act.push(['cond', f.cond]); if (f.price !== 'any') act.push(['price', PRICE_BUCKETS.find(b => b.id === f.price).label]); if (f.area !== 'Any') act.push(['area', f.area]); if (f.reviewed) act.push(['reviewed', 'Verified listings']);
+  $('#mk-active').innerHTML = act.length ? act.map(([k, l]) => `<button type="button" class="inline-flex items-center gap-2 h-9 pl-3.5 pr-2.5 rounded-lg bg-white border border-line text-[13px] font-bold text-ink hover:bg-gray-50 hover:border-gray-300 transition-colors shadow-sm" data-action="clear-one" data-key="${k}" aria-label="Remove filter ${esc(l)}">${esc(l)}<span class="w-4 h-4 rounded bg-canvas grid place-items-center ml-1"><i data-lucide="x" class="w-3 h-3 text-muted"></i></span></button>`).join('') + btn('Clear all', { v: 'tertiary', size: 'sm', cls: 'font-bold', attrs: 'data-action="clear-filters"' }) : '';
+  $('#mk-grid').innerHTML = r.length ? r.map(productCard).join('') : `<div class="col-span-full">${emptyState('search-x', 'No materials match these criteria', 'Try a broader search, select a different area, or clear active filters.', btn('Clear all filters', { v: 'primary', attrs: 'data-action="clear-filters"' }))}</div>`;
+  const pd = $('#panel-desktop'); if (pd) pd.innerHTML = filterPanel();
+  const pm = $('#panel-mobile'); if (pm) pm.innerHTML = filterPanel();
+  const dc = $('#drawer-count'); if (dc) dc.textContent = `Show ${r.length} ${r.length === 1 ? 'Result' : 'Results'}`;
+  icons();
+}
+function openFilters() {
+  $('#drawer-root').innerHTML = `<div class="fixed inset-0 z-[60]"><div class="absolute inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" data-action="close-filters"></div>
+    <div role="dialog" aria-modal="true" aria-label="Filters" class="absolute inset-y-0 left-0 w-[85%] max-w-sm bg-white flex flex-col drawer-in shadow-2xl">
+      <div class="flex items-center justify-between px-5 h-16 border-b border-line"><h2 class="font-extrabold text-lg">Filters</h2><button type="button" class="icon-btn -mr-2 bg-canvas" data-action="close-filters" aria-label="Close filters"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+      <div id="panel-mobile" class="flex-1 overflow-y-auto p-4 no-scrollbar">${filterPanel()}</div>
+      <div class="p-5 border-t border-line flex gap-3 bg-canvas">${btn('Clear All', { attrs: 'data-action="clear-filters"', cls: 'flex-1 bg-white font-bold border-line shadow-sm' })}${btn(`Show ${filtered().length} Results`, { v: 'primary', cls: 'flex-[2] shadow-md', attrs: 'data-action="close-filters" id="drawer-count"' })}</div></div></div>`;
+  lockScroll(); icons(); setTimeout(() => $('#drawer-root [data-action="close-filters"]:last-of-type')?.focus(), 20);
+}
+function closeFilters() { $('#drawer-root').innerHTML = ''; lockScroll(); }
+
+/* Product Detail & Enquiry */
+function productModalBody(p) {
+  const sv = savePct(p), saved = state.saved.includes(p.id);
+  const row = (k, v) => `<div class="py-3 flex justify-between gap-4 text-[15px]"><dt class="text-muted font-medium">${k}</dt><dd class="font-bold text-right text-ink">${v}</dd></div>`;
+  return `<div class="overflow-hidden rounded-xl border border-line mb-5 relative"><img src="${imgOf(p)}" alt="${esc(p.title)}" class="w-full aspect-[16/9] object-cover"></div>
+    <div class="flex flex-wrap gap-3 items-center mb-3">${statusBadge(p.status)}<span class="text-xs font-bold uppercase tracking-wider text-muted">${esc(p.cat)}</span></div>
+    <h3 class="text-2xl font-extrabold leading-tight text-ink mb-4">${esc(p.title)}</h3>
+    <div class="flex items-baseline gap-2.5 flex-wrap bg-canvas p-4 rounded-xl border border-line mb-6"><span class="text-4xl font-black tracking-tight text-ink">${inr(p.price)}</span><span class="text-lg font-medium text-muted">/ ${esc(p.unit)}</span>${p.mrp > p.price ? `<span class="text-[15px] font-medium text-muted line-through ml-2">${inr(p.mrp)}</span><span class="text-sm font-bold text-success ml-auto bg-success-50 px-2.5 py-1 rounded-md">Save ${sv}%</span>` : ''}</div>
+    <p class="text-[15px] leading-relaxed text-ink font-medium mb-8">${esc(p.desc)}</p>
+    <div class="card p-1">
+      <dl class="divide-y divide-line px-5 py-2">
+        ${row('Availability', `${p.qty.toLocaleString('en-IN')}${esc(p.unit)}`)}${row('Total Lot Value', inr(lot(p)))}${row('Condition', esc(p.cond))}${row('Shelf Life', esc(p.shelf))}${row('Pickup Location', `${esc(p.area)}, Pune`)}${row('Seller Name', esc(p.seller))}${row('Listed On', fmtDate(p.created))}
+      </dl>
+    </div>
+    <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3 pt-2 border-t border-line">${btn(saved ? 'Saved to Profile' : 'Save Listing', { icon: 'heart', cls: `w-full sm:w-auto font-bold ${saved ? 'text-brand border-brand bg-brand-50' : 'bg-white'}`, attrs: `data-action="save" data-id="${p.id}" aria-pressed="${saved}"` })}${btn('Contact Seller', { v: 'primary', icon: 'message-square', cls: 'w-full flex-1 shadow-md', attrs: `data-action="enquire" data-id="${p.id}"` })}</div>`;
+}
+function enquiryBody(p) {
+  return `<form data-form="enquiry" data-id="${p.id}" novalidate class="space-y-5">
+    <div class="flex gap-4 items-center p-4 rounded-xl bg-canvas border border-line mb-2"><img src="${imgOf(p)}" alt="" class="w-16 h-16 rounded-lg object-cover shadow-sm"><div class="min-w-0"><p class="text-[15px] font-bold truncate text-ink">${esc(p.title)}</p><p class="text-sm font-medium text-muted mt-1">${inr(p.price)} / ${esc(p.unit)} · ${esc(p.area)}</p></div></div>
+    ${field({ id: 'en-name', label: 'Your Full Name', req: true, ph: 'Enter your name', attrs: 'autocomplete="name"' })}
+    ${field({ id: 'en-phone', label: 'Mobile Number', type: 'tel', req: true, ph: '10-digit number', attrs: 'autocomplete="tel" inputmode="numeric"' })}
+    ${field({ id: 'en-qty', label: `Quantity Required (${esc(p.unit)})`, type: 'number', req: true, ph: `Available: ${p.qty}`, attrs: `min="1" max="${p.qty}"` })}
+    ${field({ id: 'en-msg', label: 'Message to Seller', type: 'textarea', rows: 4, ph: 'Include preferred pickup timing, specific questions about condition, or logistics.' })}
+    <div class="flex justify-end gap-3 pt-4 mt-2 border-t border-line">${btn('Back to Details', { cls: 'font-bold bg-white', attrs: `data-action="open" data-id="${p.id}"` })}<button type="submit" class="btn btn-primary shadow-md px-6">Submit Enquiry</button></div>
+    </form>`;
+}
+
+/* Sell Flow */
+let sellPhotos = [];
+function viewSell() {
+  const sec = (n, t, d, inner) => `<section class="card p-6 sm:p-8"><div class="flex items-start gap-4 mb-6"><span class="w-8 h-8 rounded-full bg-ink text-white text-sm font-bold flex items-center justify-center shrink-0 shadow-sm">${n}</span><div><h2 class="text-lg font-extrabold text-ink">${t}</h2><p class="text-[15px] font-medium text-muted mt-1">${d}</p></div></div>${inner}</section>`;
+  return `<section class="wrap py-10 lg:py-14">
+    <div class="max-w-3xl mb-10"><h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-ink">List Surplus Materials</h1><p class="mt-3 text-lg font-medium text-muted">Complete this form to reach buyers in your area. Listings are verified to maintain marketplace quality.</p></div>
+    <form data-form="sell" novalidate class="grid lg:grid-cols-[1fr_340px] gap-8 items-start">
+      <div class="space-y-6">
+        ${sec(1, 'Material Specifications', 'Provide accurate details to attract the right buyers.', `<div class="grid gap-5 sm:grid-cols-2"><div class="sm:col-span-2">${field({ id: 'title', label: 'Listing Title', req: true, ph: 'e.g. Vitrified floor tiles, 600×600 mm, matte ivory' })}</div>${field({ id: 'cat', label: 'Material Category', req: true, opts: CATS })}${field({ id: 'spec', label: 'Brand or Specification', ph: 'Grade, size, batch info' })}<div class="sm:col-span-2">${field({ id: 'desc', label: 'Detailed Description', type: 'textarea', req: true, ph: 'Detail origin, storage conditions, and any specifics buyers should be aware of.', help: 'Minimum 20 characters.' })}</div></div>`)}
+        ${sec(2, 'Pricing & Inventory', 'Set your asking price. The total lot value is calculated automatically.', `<div class="grid gap-5 sm:grid-cols-2">${field({ id: 'price', label: 'Asking Price per Unit (₹)', type: 'number', req: true, ph: '0', attrs: 'min="0" step="any"' })}${field({ id: 'unit', label: 'Unit of Measurement', req: true, opts: UNITS })}${field({ id: 'qty', label: 'Total Quantity Available', type: 'number', req: true, ph: '0', attrs: 'min="1"' })}${field({ id: 'mrp', label: 'Standard Market Price (₹)', type: 'number', ph: 'Original price', attrs: 'min="0" step="any"', help: 'Highlights the savings percentage to buyers.' })}</div>`)}
+        ${sec(3, 'Condition Details', 'Honest condition reporting builds buyer trust.', `<div class="grid gap-5 sm:grid-cols-2">${field({ id: 'cond', label: 'Material Condition', req: true, opts: CONDS })}${field({ id: 'shelf', label: 'Remaining Shelf Life', req: true, opts: SHELF })}</div>`)}
+        ${sec(4, 'Visual Media', 'Listings with clear photos perform significantly better.', `<label class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-line bg-canvas/50 rounded-xl py-10 px-6 text-center cursor-pointer hover:border-brand hover:bg-brand-50/50 transition-colors focus-within:ring-2 focus-within:ring-brand"><div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-2"><i data-lucide="image-plus" class="w-6 h-6 text-brand"></i></div><span class="text-[15px] font-bold text-ink">Upload Photos</span><span class="text-sm font-medium text-muted">JPG or PNG supported</span><input id="photos" type="file" accept="image/*" multiple class="sr-only" data-input="photos"></label><p data-err="photos" class="hidden text-xs text-danger mt-2 font-medium" role="alert"></p><div id="photo-list" class="mt-4 flex gap-4 flex-wrap"></div>`)}
+        ${sec(5, 'Logistics', 'Where should the buyer collect the materials?', `<div class="grid gap-5 sm:grid-cols-2">${field({ id: 'area', label: 'Region in Pune', req: true, opts: AREAS })}${field({ id: 'landmark', label: 'Landmark or Site Name', ph: 'e.g. Near Tech Park' })}<div class="sm:col-span-2">${field({ id: 'pickup', label: 'Pickup Availability', ph: 'e.g. Weekdays 10am–5pm' })}</div></div>`)}
+        ${sec(6, 'Contact Information', 'Shared securely only with accepted inquiries.', `<div class="grid gap-5 sm:grid-cols-2">${field({ id: 'sname', label: 'Business or Contact Name', req: true, attrs: 'autocomplete="organization"' })}${field({ id: 'sphone', label: 'Mobile Number', type: 'tel', req: true, attrs: 'autocomplete="tel" inputmode="numeric"' })}<div class="sm:col-span-2">${field({ id: 'semail', label: 'Email Address', type: 'email', req: true, attrs: 'autocomplete="email"' })}</div></div>
+          <label class="mt-8 flex gap-3 text-[14px] font-medium text-ink cursor-pointer bg-canvas p-4 rounded-xl border border-line"><input id="consent" name="consent" type="checkbox" class="w-5 h-5 mt-0.5 accent-brand rounded border-line cursor-pointer"><span class="leading-snug">I confirm the details provided are accurate and I possess the legal right to sell these materials.</span></label><p data-err="consent" class="hidden text-xs text-danger mt-2 font-medium" role="alert"></p>`)}
+        <div class="flex flex-col-reverse sm:flex-row gap-4 sm:justify-end pt-4">${linkBtn('Cancel', '#/dashboard', { v: 'secondary', cls: 'w-full sm:w-auto font-bold bg-white' })}<button type="submit" class="btn btn-primary btn-lg w-full sm:w-auto shadow-md px-8">Submit Listing for Review</button></div>
+      </div>
+      <aside class="card lg:sticky lg:top-28 shadow-lg border-line overflow-hidden">
+        <div class="bg-ink p-5"><h2 class="font-extrabold text-white text-lg flex items-center gap-2"><i data-lucide="calculator" class="w-5 h-5 text-brand"></i> Estimated Payout</h2><p class="text-[13px] text-[#A1A1AA] font-medium mt-1">Calculates automatically as you type.</p></div>
+        <div class="p-6">
+          <dl class="space-y-4 text-[15px] font-medium text-ink"><div class="flex justify-between pb-4 border-b border-line"><dt class="text-muted">Total Lot Value</dt><dd id="pay-total" class="font-bold">₹0</dd></div><div class="flex justify-between pb-4 border-b border-line"><dt class="text-muted">Platform Fee (${COMMISSION * 100}%)</dt><dd id="pay-fee" class="font-bold text-danger">− ₹0</dd></div><div class="flex justify-between items-center pt-2"><dt class="font-bold text-lg">Net Payout</dt><dd id="pay-net" class="text-2xl font-black text-brand">₹0</dd></div></dl>
+          <div class="mt-6 p-4 rounded-lg bg-canvas border border-line flex gap-3 text-[13px] font-medium text-muted leading-relaxed"><i data-lucide="shield-check" class="w-5 h-5 shrink-0 text-brand"></i><p>All listings undergo a quality review process before publication to the marketplace.</p></div>
+        </div>
+      </aside>
+    </form></section>`;
+}
+function updatePayout() {
+  const f = $('form[data-form=sell]'); if (!f) return;
+  const t = (parseFloat(f.price.value) || 0) * (parseFloat(f.qty.value) || 0), fee = t * COMMISSION;
+  $('#pay-total').textContent = inr(t); $('#pay-fee').textContent = '− ' + inr(fee); $('#pay-net').textContent = inr(t - fee);
+}
+function renderPhotos() {
+  $('#photo-list').innerHTML = sellPhotos.map((s, i) => `<div class="relative w-24 h-24 group"><img src="${s}" alt="Uploaded photo ${i + 1}" class="w-24 h-24 object-cover rounded-xl border border-line shadow-sm"><button type="button" data-action="remove-photo" data-i="${i}" class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-danger text-white grid place-items-center shadow-md scale-0 group-hover:scale-100 transition-transform" aria-label="Remove photo ${i + 1}"><i data-lucide="x" class="w-4 h-4"></i></button></div>`).join('');
+  icons();
+}
+function resizeImage(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = rej;
+    fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => { const s = Math.min(1, 800 / im.width), c = document.createElement('canvas'); c.width = im.width * s; c.height = im.height * s; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', .75)); }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* Dashboard */
+function viewDash() {
+  const mine = state.listings.filter(l => l.mine), inbound = state.enquiries.filter(e => e.dir === 'in'), sent = state.enquiries.filter(e => e.dir === 'out');
+  const tabs = [['overview', 'layout-dashboard', 'Overview'], ['listings', 'boxes', 'My Listings'], ['enquiries', 'inbox', 'Enquiries']];
+  const side = tabs.map(([k, i, l]) => `<button type="button" class="filter-opt gap-3 !justify-start whitespace-nowrap text-[15px] font-bold py-3 px-4 ${state.dash === k ? 'bg-ink text-white hover:bg-ink' : 'hover:bg-canvas text-muted hover:text-ink'}" aria-pressed="${state.dash === k}" data-action="dash-tab" data-tab="${k}"><i data-lucide="${i}" class="w-5 h-5 ${state.dash === k ? 'text-brand' : ''}"></i>${l}${k === 'enquiries' && inbound.some(e => e.status === 'new') ? `<span class="ml-auto badge bg-brand text-white h-5 px-2 rounded">${inbound.filter(e => e.status === 'new').length}</span>` : ''}</button>`).join('');
+  const active = mine.filter(l => l.status !== 'pending');
+  const listRow = l => `<div class="flex items-center gap-4 sm:gap-5 py-4 hover:bg-canvas/50 px-2 -mx-2 rounded-lg transition-colors"><img src="${imgOf(l)}" alt="" class="w-16 h-16 rounded-xl object-cover border border-line shadow-sm shrink-0"><div class="min-w-0 flex-1"><p class="text-[15px] font-bold text-ink truncate">${esc(l.title)}</p><p class="text-[13px] font-medium text-muted mt-1">${inr(l.price)} / ${esc(l.unit)} <span class="mx-1.5">•</span> ${l.qty.toLocaleString('en-IN')} available <span class="mx-1.5">•</span> ${esc(l.area)}</p></div><div class="hidden md:block">${statusBadge(l.status)}</div><div class="flex gap-2">${btn('', { v: 'secondary', size: 'sm', icon: 'eye', cls: 'bg-white shadow-sm', attrs: `data-action="open" data-id="${l.id}" aria-label="View listing"` })}${btn('', { v: 'secondary', size: 'sm', icon: 'trash-2', cls: 'text-danger bg-white shadow-sm hover:bg-danger-50 hover:border-danger hover:text-danger', attrs: `data-action="delete-listing" data-id="${l.id}" aria-label="Delete listing"` })}</div></div>`;
+  const enqRow = (e, actions) => `<div class="py-5"><div class="flex items-start justify-between gap-4"><div class="min-w-0"><p class="text-[15px] font-bold text-ink">${esc(e.buyer)} <span class="text-muted font-medium ml-2 border-l border-line pl-2">${e.qty} requested</span></p><p class="text-[13px] font-medium text-muted mt-1 truncate">${esc(e.listingTitle)} <span class="mx-1.5">•</span> ${fmtDate(e.created)}</p></div><span class="badge ${e.status === 'accepted' ? 'bg-success-50 text-success' : e.status === 'rejected' ? 'bg-danger-50 text-danger' : 'bg-warning-50 text-warning'} capitalize px-3 py-1 text-[11px]">${e.status === 'new' && e.dir === 'out' ? 'Sent' : e.status}</span></div><div class="mt-3 bg-canvas p-3 rounded-lg border border-line text-[14px] text-ink font-medium leading-relaxed">${esc(e.message || 'No message provided.')}</div>${actions && e.status === 'new' ? `<div class="mt-4 flex gap-3">${btn('Accept Request', { v: 'primary', size: 'sm', icon: 'check', cls: 'shadow-sm', attrs: `data-action="enq-accept" data-id="${e.id}"` })}${btn('Decline', { v: 'danger', size: 'sm', icon: 'x', cls: 'shadow-sm', attrs: `data-action="enq-reject" data-id="${e.id}"` })}</div>` : ''}</div>`;
+  let content = '';
+  if (state.dash === 'overview') {
+    const potential = active.reduce((s, l) => s + lot(l) * (1 - COMMISSION), 0);
+    content = `<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">${statCard('Active Listings', active.length, 'boxes')}${statCard('Pending Review', mine.length - active.length, 'clock')}${statCard('New Enquiries', inbound.filter(e => e.status === 'new').length, 'inbox')}${statCard('Potential Net', inr(potential), 'indian-rupee')}</div>
+      <div class="mt-8 grid xl:grid-cols-2 gap-6"><div class="card p-6"><div class="flex items-center justify-between border-b border-line pb-4 mb-2"><h2 class="text-lg font-bold text-ink">Recent Enquiries</h2>${btn('View All', { v: 'tertiary', size: 'sm', cls: 'font-bold text-brand', attrs: 'data-action="dash-tab" data-tab="enquiries"' })}</div><div class="divide-y divide-line">${inbound.length ? inbound.slice(0, 2).map(e => enqRow(e, true)).join('') : '<div class="py-8 text-center text-[15px] font-medium text-muted bg-canvas rounded-lg mt-4 border border-dashed border-line">No enquiries received yet.</div>'}</div></div>
+      <div class="card p-6"><div class="flex items-center justify-between border-b border-line pb-4 mb-2"><h2 class="text-lg font-bold text-ink">Your Listings</h2>${btn('Manage', { v: 'tertiary', size: 'sm', cls: 'font-bold text-brand', attrs: 'data-action="dash-tab" data-tab="listings"' })}</div><div class="divide-y divide-line">${mine.length ? mine.slice(0, 3).map(listRow).join('') : '<div class="py-8 text-center text-[15px] font-medium text-muted bg-canvas rounded-lg mt-4 border border-dashed border-line">No active listings yet.</div>'}</div></div></div>`;
+  } else if (state.dash === 'listings') {
+    content = `<div class="card p-6 shadow-sm"><div class="flex items-center justify-between border-b border-line pb-4 mb-2"><h2 class="text-lg font-bold text-ink">My Listings</h2><span class="text-[13px] font-bold text-muted bg-canvas px-3 py-1 rounded-full border border-line">${mine.length} Total</span></div>${mine.length ? `<div class="divide-y divide-line">${mine.map(listRow).join('')}</div>` : emptyState('boxes', 'No listings created', 'List your first batch of surplus material to start receiving enquiries.', linkBtn('List Surplus', '#/sell', { v: 'primary' }))}</div>`;
+  } else {
+    content = `<div class="card p-6 shadow-sm"><h2 class="text-lg font-bold text-ink border-b border-line pb-4 mb-2">Received Inquiries</h2><div class="divide-y divide-line">${inbound.length ? inbound.map(e => enqRow(e, true)).join('') : '<div class="py-10 text-center text-[15px] font-medium text-muted">No enquiries received yet.</div>'}</div></div>
+      <div class="card p-6 shadow-sm mt-6"><h2 class="text-lg font-bold text-ink border-b border-line pb-4 mb-2">Sent Inquiries</h2><div class="divide-y divide-line">${sent.length ? sent.map(e => enqRow(e, false)).join('') : '<div class="py-10 text-center text-[15px] font-medium text-muted">Enquiries you initiate from the marketplace will appear here.</div>'}</div></div>`;
+  }
+  return `<section class="wrap py-8 lg:py-12"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8"><div><h1 class="text-3xl lg:text-4xl font-extrabold tracking-tight text-ink">Seller Dashboard</h1><p class="mt-2 text-lg font-medium text-muted">Manage your listings, enquiries, and account performance.</p></div>${linkBtn('New Listing', '#/sell', { v: 'primary', icon: 'plus', cls: 'shadow-md w-full sm:w-auto' })}</div>
+    <div class="lg:grid lg:grid-cols-[240px_1fr] gap-8 items-start"><nav class="card p-2.5 flex lg:flex-col gap-1.5 overflow-x-auto no-scrollbar mb-6 lg:mb-0 lg:sticky lg:top-28 shadow-sm" aria-label="Dashboard Menu">${side}</nav><div class="min-w-0">${content}</div></div></section>`;
+}
+
+/* ---------- Routing Engine ---------- */
+function route() {
+  closeFilters(); while (modals.length) closeModal();
+  const h = (location.hash || '#/').replace(/^#\/?/, '');
+  const view = h === 'marketplace' || h === 'sell' || h === 'dashboard' ? h : 'home';
+  state.view = view;
+  const app = $('#app');
+  app.innerHTML = { home: viewHome, marketplace: viewMarket, sell: viewSell, dashboard: viewDash }[view]();
+  if (view === 'home') renderHomeFeatured();
+  if (view === 'marketplace') updateMarket();
+  if (view === 'sell') { sellPhotos = []; }
+  renderNav(); icons();
+  const target = h === 'how' || h === 'sustainability' ? $('#' + h) : null;
+  if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  document.title = ({ home: 'SurplusSetu — Sustainable Construction Materials', marketplace: 'Marketplace — SurplusSetu', sell: 'List Surplus — SurplusSetu', dashboard: 'Dashboard — SurplusSetu' })[view];
+}
+function refreshViews() {
+  if (state.view === 'home') renderHomeFeatured(); else if (state.view === 'marketplace') updateMarket(); else if (state.view === 'dashboard') { $('#app').innerHTML = viewDash(); icons(); }
+}
+
+/* ---------- Event Listeners & Actions ---------- */
+const actions = {
+  'nav-toggle'(el) { const m = $('#mobile-menu'), open = m.classList.toggle('hidden') === false; el.setAttribute('aria-expanded', open); el.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); },
+  open(el) { const p = byId(el.dataset.id); if (!p) return; lastProductModal = p.id; if (modals.length) setModalBody(productModalBody(p), 'Material Details'); else openModal({ title: 'Material Details', size: 'max-w-xl', body: productModalBody(p) }); },
+  save(el) {
+    const id = el.dataset.id, i = state.saved.indexOf(id);
+    if (i > -1) { state.saved.splice(i, 1); toast('Removed from saved listings', 'info'); } else { state.saved.push(id); toast('Listing saved to your profile.'); }
+    persist(); refreshViews();
+    if (modals.length && lastProductModal === id) setModalBody(productModalBody(byId(id)));
+  },
+  'close-modal'() { closeModal(); },
+  'confirm-yes'() { const cb = confirmCb; confirmCb = null; closeModal(); cb && cb(); },
+  enquire(el) { const p = byId(el.dataset.id); setModalBody(enquiryBody(p), 'Contact Seller'); },
+  login() { openModal({ title: 'Account Login', size: 'max-w-md', body: `<form data-form="login" novalidate class="space-y-5">${field({ id: 'l-email', label: 'Email Address', type: 'email', req: true, attrs: 'autocomplete="email"' })}${field({ id: 'l-pass', label: 'Password', type: 'password', req: true, attrs: 'autocomplete="current-password"' })}<button type="submit" class="btn btn-primary w-full btn-lg shadow-md mt-2">Log in securely</button></form>` }); },
+  'home-cat'(el) { state.homeCat = el.dataset.cat; renderHomeFeatured(); },
+  'set-filter'(el) { state.f[el.dataset.key] = el.dataset.val; updateMarket(); },
+  'clear-one'(el) { const k = el.dataset.key; state.f[k] = { q: '', cond: 'Any', price: 'any', area: 'Any', reviewed: false }[k]; if (k === 'q') $('#mk-q').value = ''; updateMarket(); },
+  'clear-filters'() { Object.assign(state.f, { q: '', cat: 'All', cond: 'Any', price: 'any', area: 'Any', reviewed: false }); const q = $('#mk-q'); if (q) q.value = ''; updateMarket(); },
+  'open-filters'() { openFilters(); },
+  'close-filters'() { closeFilters(); },
+  'goto-cat'(el) { state.f.cat = el.dataset.cat; if (state.view === 'marketplace') updateMarket(); },
+  'dash-tab'(el) { state.dash = el.dataset.tab; $('#app').innerHTML = viewDash(); icons(); },
+  'delete-listing'(el) { const l = byId(el.dataset.id); confirmDialog({ title: 'Delete this listing?', text: `“${esc(l.title)}” will be permanently removed from the marketplace. This action cannot be undone.`, label: 'Delete Listing', onConfirm() { state.listings = state.listings.filter(x => x.id !== l.id); persist(); refreshViews(); toast('Listing deleted successfully.'); } }); },
+  'enq-accept'(el) { const e = state.enquiries.find(x => x.id === el.dataset.id); e.status = 'accepted'; persist(); refreshViews(); toast('Enquiry accepted. Buyer contact information shared.'); },
+  'enq-reject'(el) { const e = state.enquiries.find(x => x.id === el.dataset.id); confirmDialog({ title: 'Decline this enquiry?', text: `${esc(e.buyer)} will be notified that the material is unavailable for their request.`, label: 'Decline Enquiry', onConfirm() { e.status = 'rejected'; persist(); refreshViews(); toast('Enquiry declined.', 'info'); } }); },
+  'remove-photo'(el) { sellPhotos.splice(+el.dataset.i, 1); renderPhotos(); }
+};
+document.addEventListener('click', e => { const t = e.target.closest('[data-action]'); if (!t) return; const a = actions[t.dataset.action]; if (a) { if (t.tagName === 'A' && t.dataset.action !== 'goto-cat') e.preventDefault(); a(t, e); } });
+document.addEventListener('input', e => {
+  const k = e.target.dataset.input;
+  if (k === 'q') { state.f.q = e.target.value; updateMarket(); }
+  if (e.target.form && e.target.form.dataset.form === 'sell') { updatePayout(); e.target.removeAttribute('aria-invalid'); const o = $(`[data-err="${e.target.id}"]`, e.target.form); if (o) o.classList.add('hidden'); }
+});
+document.addEventListener('change', async e => {
+  const k = e.target.dataset.input;
+  if (k === 'sort') { state.f.sort = e.target.value; updateMarket(); }
+  if (k === 'reviewed') { state.f.reviewed = e.target.checked; updateMarket(); }
+  if (k === 'photos') {
+    const err = $('[data-err="photos"]'); err.classList.add('hidden');
+    for (const f of [...e.target.files]) { if (sellPhotos.length >= 3) { err.textContent = 'A maximum of 3 photos is allowed.'; err.classList.remove('hidden'); break; } if (!f.type.startsWith('image/')) { err.textContent = 'Only image files are supported.'; err.classList.remove('hidden'); continue; } try { sellPhotos.push(await resizeImage(f)); } catch (x) { err.textContent = 'Image error. Please try a different file.'; err.classList.remove('hidden'); } }
+    e.target.value = ''; renderPhotos();
+  }
+});
+document.addEventListener('submit', e => {
+  const form = e.target, kind = form.dataset.form; if (!kind) return; e.preventDefault();
+  if (kind === 'login') {
+    if (!validate(form, { 'l-email': v => emailRule(v), 'l-pass': v => v.length >= 6 ? '' : 'Password must be at least 6 characters.' })) return;
+    closeModal(); toast('Signed in successfully.');
+  }
+  if (kind === 'enquiry') {
+    const p = byId(form.dataset.id);
+    if (!validate(form, { 'en-name': need('Please enter your full name.'), 'en-phone': phoneRule, 'en-qty': v => (+v >= 1 && +v <= p.qty) ? '' : `Enter a quantity between 1 and ${p.qty}.` })) return;
+    state.enquiries.unshift({ id: 'e' + Date.now(), dir: 'out', listingId: p.id, listingTitle: p.title, buyer: form['en-name'].value.trim(), phone: form['en-phone'].value.trim(), qty: +form['en-qty'].value, message: form['en-msg'].value.trim(), status: 'new', created: Date.now() });
+    persist(); closeModal(); toast('Enquiry submitted. Monitor status in your Dashboard.');
+  }
+  if (kind === 'sell') {
+    const r = {
+      title: v => v.length >= 5 ? '' : 'Provide a descriptive title (min 5 characters).', cat: need('Please select a category.'), desc: v => v.length >= 20 ? '' : 'Provide a detailed description (min 20 characters).',
+      price: v => +v > 0 ? '' : 'Price must be greater than ₹0.', unit: need('Select a unit of measurement.'), qty: v => +v >= 1 ? '' : 'Quantity must be at least 1.',
+      mrp: v => !v || +v > +form.price.value ? '' : 'Market price should be higher than your asking price.',
+      cond: need('Select the material condition.'), shelf: need('Select remaining shelf life.'), area: need('Select a pickup location.'),
+      sname: need('Enter business or contact name.'), sphone: phoneRule, semail: emailRule, consent: v => v ? '' : 'You must accept the terms to continue.'
+    };
+    if (!validate(form, r)) { toast('Please correct the highlighted fields.', 'error'); return; }
+    const listing = { id: 'm' + Date.now(), mine: 1, title: form.elements.title.value.trim(), cat: form.cat.value, price: +form.price.value, mrp: +form.mrp.value || 0, unit: form.unit.value, qty: +form.qty.value, cond: form.cond.value, shelf: form.shelf.value, area: form.area.value, seller: 'Your Business Profile', status: 'pending', created: Date.now(), desc: form.desc.value.trim(), imgs: sellPhotos.slice() };
+    state.listings.unshift(listing);
+    if (!store.set('ss_listings_v2', state.listings)) { state.listings[0].imgs = []; persist(); toast('Storage limit reached; listing saved without images.', 'info'); }
+    state.dash = 'listings'; toast('Listing submitted successfully for review.'); location.hash = '#/dashboard';
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (modals.length) { closeModal(); } else if ($('#drawer-root').firstChild) closeFilters(); else { const m = $('#mobile-menu'); if (m && !m.classList.contains('hidden')) { m.classList.add('hidden'); } } }
+  if (e.key === 'Tab') {
+    const dlg = modals.length ? $('[role=dialog]', modals[modals.length - 1]) :$('#drawer-root [role=dialog]');
+    if (!dlg) return; const f = focusables(dlg); if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } else if (!dlg.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  }
+});
+window.addEventListener('hashchange', route);
+renderFooter();
+route();
+</script>
+</body>
+</html>
